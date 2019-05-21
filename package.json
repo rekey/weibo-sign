@@ -1,0 +1,19 @@
+{
+  "name": "weibo-sso-ts",
+  "version": "1.0.0",
+  "description": "",
+  "main": "./build/index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git@git.rechangapp.net:luolaibiao/weibo-sso-ts.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@types/request": "^2.48.1",
+    "request": "^2.88.0"
+  }
+}
