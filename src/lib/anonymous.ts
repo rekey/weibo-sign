@@ -1,33 +1,8 @@
 import request = require('request');
-import {RequestAPI, Request, CoreOptions, RequiredUriUrl} from 'request';
 
-interface IResponseBody<T> {
-  retcode: number,
-  msg: string,
-  data: T
-}
+import util = require('./util');
 
-interface IGenVisitor {
-  tid: string
-  new_tid: Boolean
-  confidence: number
-}
-
-interface IVisitor {
-  sub: string
-  subp: string
-}
-
-interface IRequestAPI extends RequestAPI<Request, CoreOptions, RequiredUriUrl> {
-
-}
-
-const ua = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_5) ' +
-  'AppleWebKit/537.36 (KHTML, like Gecko) Chrome/74.0.3729.157 Safari/537.36';
-const chromePlugins = 'Portable Document Format::internal-pdf-viewer::Chrome PDF Plugin' +
-  '|::mhjfbmdgcfjbbpaeojofohoefgiehjai::Chrome PDF Viewer|::internal-nacl-plugin::Native Client';
-
-function genVisitor(anonymousRequest: IRequestAPI): Promise<string> {
+function genVisitor(anonymousRequest: util.IRequestAPI): Promise<string> {
   return new Promise((resolve, reject) => {
     anonymousRequest({
       uri: 'https://passport.weibo.com/visitor/genvisitor',
@@ -53,7 +28,7 @@ function genVisitor(anonymousRequest: IRequestAPI): Promise<string> {
   });
 }
 
-function genVisitorPost(anonymousRequest: IRequestAPI): Promise<string> {
+function genVisitorPost(anonymousRequest: util.IRequestAPI): Promise<string> {
   return new Promise((resolve, reject) => {
     anonymousRequest({
       uri: 'https://passport.weibo.com/visitor/genvisitor',
@@ -65,7 +40,7 @@ function genVisitorPost(anonymousRequest: IRequestAPI): Promise<string> {
           "browser": "Chrome74,0,3729,157",
           "fonts": "undefined",
           "screenInfo": "1920*1080*24",
-          "plugins": chromePlugins
+          "plugins": util.chromePlugins
         })
       }
     }, (err, resp, body) => {
@@ -82,21 +57,7 @@ function genVisitorPost(anonymousRequest: IRequestAPI): Promise<string> {
   });
 }
 
-function parsePostBody<T>(body: string, fn: string): T {
-  const host = {
-    [fn]: function (data: any) {
-      return data;
-    }
-  };
-  return new Function(`
-    const window = this;
-    const ${fn} = this.${fn};
-    return ${body};`
-  ).bind(host)();
-}
-
-function getCookies(anonymousRequest: IRequestAPI,
-                    data: IGenVisitor): Promise<string> {
+function getCookies(anonymousRequest: util.IRequestAPI, data: util.IGenVisitor): Promise<string> {
   return new Promise((resolve, reject) => {
     anonymousRequest({
       uri: 'https://passport.weibo.com/visitor/visitor',
@@ -122,12 +83,12 @@ function getCookies(anonymousRequest: IRequestAPI,
   });
 }
 
-export async function getAnonymousRequest(): Promise<IRequestAPI> {
+export async function getRequest(): Promise<util.IRequestAPI> {
   const anonymousRequest = request.defaults({
     headers: {
       DNT: 1,
       'Upgrade-Insecure-Requests': 1,
-      'User-Agent': ua
+      'User-Agent': util.ua
     },
     forever: true,
     jar: true,
@@ -135,9 +96,9 @@ export async function getAnonymousRequest(): Promise<IRequestAPI> {
   });
   await genVisitor(anonymousRequest);
   const genVisitorResp = await genVisitorPost(anonymousRequest);
-  const genVisitorBody: IResponseBody<IGenVisitor> = parsePostBody(genVisitorResp, 'gen_callback');
+  const genVisitorBody: util.IResponseBody<util.IGenVisitor> = util.parseResp(genVisitorResp, 'gen_callback');
   await getCookies(anonymousRequest, genVisitorBody.data);
   // const cookieResp = await getCookies(anonymousRequest, genVisitorBody.data);
-  // const cookieBody: IResponseBody<IVisitor> = parsePostBody(cookieResp, 'cross_domain');
+  // const cookieBody: IResponseBody<IVisitor> = util.parseResp(cookieResp, 'cross_domain');
   return anonymousRequest;
 }
