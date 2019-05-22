@@ -1,2 +1,2 @@
-# weibo-sso-ts
+# weibo-sign
 
