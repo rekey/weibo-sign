@@ -18,12 +18,16 @@ interface IVisitor {
   subp: string
 }
 
+interface IRequestAPI extends RequestAPI<Request, CoreOptions, RequiredUriUrl> {
+
+}
+
 const ua = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_5) ' +
   'AppleWebKit/537.36 (KHTML, like Gecko) Chrome/74.0.3729.157 Safari/537.36';
 const chromePlugins = 'Portable Document Format::internal-pdf-viewer::Chrome PDF Plugin' +
   '|::mhjfbmdgcfjbbpaeojofohoefgiehjai::Chrome PDF Viewer|::internal-nacl-plugin::Native Client';
 
-function genVisitor(anonymousRequest: RequestAPI<Request, CoreOptions, RequiredUriUrl>): Promise<string> {
+function genVisitor(anonymousRequest: IRequestAPI): Promise<string> {
   return new Promise((resolve, reject) => {
     anonymousRequest({
       uri: 'https://passport.weibo.com/visitor/genvisitor',
@@ -49,7 +53,7 @@ function genVisitor(anonymousRequest: RequestAPI<Request, CoreOptions, RequiredU
   });
 }
 
-function genVisitorPost(anonymousRequest: RequestAPI<Request, CoreOptions, RequiredUriUrl>): Promise<string> {
+function genVisitorPost(anonymousRequest: IRequestAPI): Promise<string> {
   return new Promise((resolve, reject) => {
     anonymousRequest({
       uri: 'https://passport.weibo.com/visitor/genvisitor',
@@ -91,7 +95,7 @@ function parsePostBody<T>(body: string, fn: string): T {
   ).bind(host)();
 }
 
-function getCookies(anonymousRequest: RequestAPI<Request, CoreOptions, RequiredUriUrl>,
+function getCookies(anonymousRequest: IRequestAPI,
                     data: IGenVisitor): Promise<string> {
   return new Promise((resolve, reject) => {
     anonymousRequest({
@@ -118,11 +122,10 @@ function getCookies(anonymousRequest: RequestAPI<Request, CoreOptions, RequiredU
   });
 }
 
-export async function getAnonymousRequest(): Promise<RequestAPI<Request, CoreOptions, RequiredUriUrl>> {
+export async function getAnonymousRequest(): Promise<IRequestAPI> {
   const anonymousRequest = request.defaults({
     headers: {
       DNT: 1,
-      Host: 'passport.weibo.com',
       'Upgrade-Insecure-Requests': 1,
       'User-Agent': ua
     },
