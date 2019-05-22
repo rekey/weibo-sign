@@ -1,5 +1,5 @@
 {
-  "name": "weibo-sso-ts",
+  "name": "weibo-sign",
   "version": "1.0.0",
   "description": "",
   "main": "./build/index.js",
@@ -8,7 +8,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git@git.rechangapp.net:luolaibiao/weibo-sso-ts.git"
+    "url": "git@github.com:rekey/weibo-sign.git"
   },
   "author": "",
   "license": "ISC",
