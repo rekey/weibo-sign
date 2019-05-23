@@ -1,8 +1,8 @@
 import request = require('request');
 
-import util = require('./util');
+import {IRequestAPI, IGenVisitor, IResponseBody, parseResp, ua, chromePlugins} from './util';
 
-function genVisitor(anonymousRequest: util.IRequestAPI): Promise<string> {
+function genVisitor(anonymousRequest: IRequestAPI): Promise<string> {
   return new Promise((resolve, reject) => {
     anonymousRequest({
       uri: 'https://passport.weibo.com/visitor/genvisitor',
@@ -28,7 +28,7 @@ function genVisitor(anonymousRequest: util.IRequestAPI): Promise<string> {
   });
 }
 
-function genVisitorPost(anonymousRequest: util.IRequestAPI): Promise<string> {
+function genVisitorPost(anonymousRequest: IRequestAPI): Promise<string> {
   return new Promise((resolve, reject) => {
     anonymousRequest({
       uri: 'https://passport.weibo.com/visitor/genvisitor',
@@ -40,7 +40,7 @@ function genVisitorPost(anonymousRequest: util.IRequestAPI): Promise<string> {
           "browser": "Chrome74,0,3729,157",
           "fonts": "undefined",
           "screenInfo": "1920*1080*24",
-          "plugins": util.chromePlugins
+          "plugins": chromePlugins
         })
       }
     }, (err, resp, body) => {
@@ -57,7 +57,7 @@ function genVisitorPost(anonymousRequest: util.IRequestAPI): Promise<string> {
   });
 }
 
-function getCookies(anonymousRequest: util.IRequestAPI, data: util.IGenVisitor): Promise<string> {
+function getCookies(anonymousRequest: IRequestAPI, data: IGenVisitor): Promise<string> {
   return new Promise((resolve, reject) => {
     anonymousRequest({
       uri: 'https://passport.weibo.com/visitor/visitor',
@@ -83,12 +83,12 @@ function getCookies(anonymousRequest: util.IRequestAPI, data: util.IGenVisitor):
   });
 }
 
-export async function getRequest(): Promise<util.IRequestAPI> {
+export async function getRequest(): Promise<IRequestAPI> {
   const anonymousRequest = request.defaults({
     headers: {
       DNT: 1,
       'Upgrade-Insecure-Requests': 1,
-      'User-Agent': util.ua
+      'User-Agent': ua
     },
     forever: true,
     jar: true,
@@ -96,9 +96,9 @@ export async function getRequest(): Promise<util.IRequestAPI> {
   });
   await genVisitor(anonymousRequest);
   const genVisitorResp = await genVisitorPost(anonymousRequest);
-  const genVisitorBody: util.IResponseBody<util.IGenVisitor> = util.parseResp(genVisitorResp, 'gen_callback');
+  const genVisitorBody: IResponseBody<IGenVisitor> = parseResp(genVisitorResp, 'gen_callback');
   await getCookies(anonymousRequest, genVisitorBody.data);
   // const cookieResp = await getCookies(anonymousRequest, genVisitorBody.data);
-  // const cookieBody: IResponseBody<IVisitor> = util.parseResp(cookieResp, 'cross_domain');
+  // const cookieBody: IResponseBody<IVisitor> = parseResp(cookieResp, 'cross_domain');
   return anonymousRequest;
 }

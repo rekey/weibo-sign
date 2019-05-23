@@ -1,5 +1,13 @@
 import {RequestAPI, Request, CoreOptions, RequiredUriUrl} from 'request';
 
+export declare class RSAKey {
+  constructor()
+
+  setPublic(n: string, e: string): void
+
+  encrypt(s: string): string
+}
+
 export interface IResponseBody<T> {
   retcode: number,
   msg: string,

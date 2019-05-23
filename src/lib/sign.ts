@@ -1,23 +1,20 @@
-declare namespace NSina {
-  export class RSAKey {
-    constructor()
+const rsa = require('node-bignumber');
 
-    setPublic(pubkey: string, offset: string): void
-
-    encrypt(str: string): string
-  }
-}
-
-const sinaSSOEncoder = require('./sinaSSO');
-
-import util = require('./util');
 import anonymous = require('./anonymous');
+import {ILogin, IPreLogin, IRequestAPI, RSAKey, parseResp} from './util';
 
 function base64(str: string) {
   return Buffer.from(str).toString('base64');
 }
 
-async function preLogin(loginRequest: util.IRequestAPI, su: string): Promise<util.IPreLogin> {
+function rsaEncrypt({pubkey, servertime, nonce}: IPreLogin, password: string) {
+  const rsaKey: RSAKey = new rsa.Key();
+  rsaKey.setPublic(pubkey, '10001');
+  const encryptStr = [servertime, nonce].join("\t") + "\n" + password;
+  return rsaKey.encrypt(encryptStr);
+}
+
+async function preLogin(loginRequest: IRequestAPI, su: string): Promise<IPreLogin> {
   return new Promise((resolve, reject) => {
     loginRequest({
       uri: 'https://login.sina.com.cn/sso/prelogin.php',
@@ -39,7 +36,7 @@ async function preLogin(loginRequest: util.IRequestAPI, su: string): Promise<uti
         reject(resp.statusCode);
         return;
       }
-      resolve(util.parseResp(body, 'preLoginCallBack'));
+      resolve(parseResp(body, 'preLoginCallBack'));
     });
   });
 }
@@ -48,7 +45,7 @@ function getPrelt() {
   return 100 + Math.floor(900 * Math.random());
 }
 
-async function setCookie(loginRequest: util.IRequestAPI, uri: string) {
+async function setCookie(loginRequest: IRequestAPI, uri: string) {
   return new Promise((resolve) => {
     loginRequest({uri}, () => {
       resolve();
@@ -56,8 +53,11 @@ async function setCookie(loginRequest: util.IRequestAPI, uri: string) {
   });
 }
 
-async function login(loginRequest: util.IRequestAPI, {rsakv, nonce, servertime}:
-  util.IPreLogin, su: string, sp: string): Promise<util.ILogin> {
+async function login(
+  loginRequest: IRequestAPI,
+  {rsakv, nonce, servertime}: IPreLogin,
+  su: string, sp: string
+): Promise<ILogin> {
   return new Promise((resolve, reject) => {
     loginRequest({
       uri: 'https://login.sina.com.cn/sso/login.php',
@@ -99,14 +99,13 @@ async function login(loginRequest: util.IRequestAPI, {rsakv, nonce, servertime}:
   });
 }
 
-export async function getRequest(username: string, password: string): Promise<util.IRequestAPI> {
+export async function getRequest(username: string, password: string): Promise<IRequestAPI> {
   const su = base64(encodeURIComponent(username));
   const loginRequest = await anonymous.getRequest();
-  const preLoginData: util.IPreLogin = await preLogin(loginRequest, su);
-  const rsaKey: NSina.RSAKey = new sinaSSOEncoder.RSAKey();
-  rsaKey.setPublic(preLoginData.pubkey, '10001');
-  const sp = rsaKey.encrypt([preLoginData.servertime, preLoginData.nonce].join("\t") + "\n" + password);
+  const preLoginData: IPreLogin = await preLogin(loginRequest, su);
+  const sp = rsaEncrypt(preLoginData, password);
   const loginData = await login(loginRequest, preLoginData, su, sp);
+  console.log(loginData);
   const ps = loginData.crossDomainUrlList.map((uri) => {
     return setCookie(loginRequest, uri);
   });
