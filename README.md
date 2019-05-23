@@ -1,6 +1,6 @@
 # weibo-sign
 
-```shell
+```bash
     npm i -S weibo-sign
 ```
 
