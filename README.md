@@ -1,7 +1,7 @@
 # weibo-sign
 
 ```bash
-    npm i -S weibo-sign
+npm i -S weibo-sign
 ```
 
 ## 匿名
