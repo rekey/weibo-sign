@@ -105,7 +105,7 @@ export async function getRequest(username: string, password: string): Promise<IR
   const preLoginData: IPreLogin = await preLogin(loginRequest, su);
   const sp = rsaEncrypt(preLoginData, password);
   const loginData = await login(loginRequest, preLoginData, su, sp);
-  console.log(loginData);
+  // console.log(loginData);
   const ps = loginData.crossDomainUrlList.map((uri) => {
     return setCookie(loginRequest, uri);
   });
