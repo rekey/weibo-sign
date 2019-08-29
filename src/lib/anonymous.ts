@@ -1,6 +1,6 @@
 import request = require('request');
 
-import {IRequestAPI, IGenVisitor, IResponseBody, parseResp, ua, chromePlugins} from './util';
+import { IRequestAPI, IGenVisitor, IResponseBody, parseResp, ua, chromePlugins } from './util';
 
 function genVisitor(anonymousRequest: IRequestAPI): Promise<string> {
   return new Promise((resolve, reject) => {
@@ -93,6 +93,9 @@ export async function getRequest(): Promise<IRequestAPI> {
     forever: true,
     jar: true,
     gzip: true,
+    agentOptions: {
+      minVersion: 'TLSv1.2'
+    }
   });
   await genVisitor(anonymousRequest);
   const genVisitorResp = await genVisitorPost(anonymousRequest);

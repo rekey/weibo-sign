@@ -1,4 +1,4 @@
-import {RequestAPI, Request, CoreOptions, RequiredUriUrl} from 'request';
+import { RequestAPI, Request, CoreOptions, RequiredUriUrl } from 'request';
 
 export declare class RSAKey {
   constructor()
@@ -48,8 +48,8 @@ export interface IRequestAPI extends RequestAPI<Request, CoreOptions, RequiredUr
 
 }
 
-export const ua = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_5) ' +
-  'AppleWebKit/537.36 (KHTML, like Gecko) Chrome/74.0.3729.157 Safari/537.36';
+export const ua = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) '
+  + 'AppleWebKit/537.36 (KHTML, like Gecko) Chrome/77.0.3865.19 Safari/537.36 Edg/77.0.235.9';
 
 export const chromePlugins = 'Portable Document Format::internal-pdf-viewer::Chrome PDF Plugin' +
   '|::mhjfbmdgcfjbbpaeojofohoefgiehjai::Chrome PDF Viewer|::internal-nacl-plugin::Native Client';
