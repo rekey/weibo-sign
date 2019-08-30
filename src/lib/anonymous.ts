@@ -94,7 +94,7 @@ export async function getRequest(): Promise<IRequestAPI> {
     jar: true,
     gzip: true,
     agentOptions: {
-      minVersion: 'TLSv1.2'
+      secureProtocol: 'TLSv1_method'
     }
   });
   await genVisitor(anonymousRequest);
